@@ -28,10 +28,10 @@ module.phys_sync_allowed = {
     ["data/entities/props/physics_box_harmless.xml"] = true,
     --["data/entities/props/physics_tubelamp.xml"] = true,
 
-    ["data/entities/props/suspended_container.xml"] = true,
-    ["data/entities/props/suspended_seamine.xml"] = true,
-    ["data/entities/props/suspended_tank_acid.xml"] = true,
-    ["data/entities/props/suspended_tank_radioactive.xml"] = true,
+    --["data/entities/props/suspended_container.xml"] = true,
+    --["data/entities/props/suspended_seamine.xml"] = true,
+    --["data/entities/props/suspended_tank_acid.xml"] = true,
+    --["data/entities/props/suspended_tank_radioactive.xml"] = true,
 
     ["data/entities/props/physics_wheel_small.xml"] = true,
     ["data/entities/props/physics_wheel_stand_01.xml"] = true,
@@ -114,11 +114,11 @@ module.phys_sync_allowed = {
     ["data/entities/props/physics/trap_electricity.xml"] = true,
     ["data/entities/props/physics/trap_ignite_enabled.xml"] = true,
     ["data/entities/props/physics/trap_ignite.xml"] = true,
-    ["data/entities/props/physics/trap_laser_enabled_left.xml"] = true,
-    ["data/entities/props/physics/trap_laser_enabled.xml"] = true,
-    ["data/entities/props/physics/trap_laser_toggling_left.xml"] = true,
-    ["data/entities/props/physics/trap_laser_toggling.xml"] = true,
-    ["data/entities/props/physics/trap_laser.xml"] = true,
+    --["data/entities/props/physics/trap_laser_enabled_left.xml"] = true,
+    --["data/entities/props/physics/trap_laser_enabled.xml"] = true,
+    --["data/entities/props/physics/trap_laser_toggling_left.xml"] = true,
+    --["data/entities/props/physics/trap_laser_toggling.xml"] = true,
+    --["data/entities/props/physics/trap_laser.xml"] = true,
 
     -- animals
     ["data/entities/buildings/essence_eater.xml"] = true,

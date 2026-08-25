@@ -1,6 +1,6 @@
 local rpc = net.new_rpc_namespace()
 local pvp = {}
-
+--TODO allow optionally voting to stay in current area
 local chunks_by_floor = {
     { { -3, 1, 3, 1 }, { 0, 0, 2, 0 } }, --(Collapsed) Mines
     { { -6, 3, 3, 4 }, { -7, 3, -7, 3 } }, --Coal Pits
@@ -729,12 +729,14 @@ function pvp.on_world_update()
     end
 end
 
-function pvp.on_new_entity(ent)
-    if
-        EntityGetFirstComponentIncludingDisabled(ent, "TeleportComponent") ~= nil
-        and string.sub(EntityGetFilename(ent), 1, 24) == "data/entities/buildings/"
-    then
-        EntityKill(ent)
+function pvp.on_new_entity(arr)
+    for _, ent in ipairs(arr) do
+        if
+            EntityGetFirstComponentIncludingDisabled(ent, "TeleportComponent") ~= nil
+            and string.sub(EntityGetFilename(ent), 1, 24) == "data/entities/buildings/"
+        then
+            EntityKill(ent)
+        end
     end
 end
 

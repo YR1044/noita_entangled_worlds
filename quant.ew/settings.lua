@@ -271,11 +271,39 @@ local function build_settings()
             ui_description = "misc",
             settings = {
                 {
+                    id = "revive_on_drop",
+                    ui_name = "revive heart statue on drop",
+                    ui_description = "respawn dead player anywhere when their heart statue is dropped or thrown",
+                    value_default = false,
+                    scope = MOD_SETTING_SCOPE_RUNTIME,
+                },
+                {
                     id = "flex",
                     ui_name = "flexible updates",
                     ui_description = "some esotaric chunk thing, may help performance, buggy",
                     value_default = false,
                     scope = MOD_SETTING_SCOPE_RUNTIME,
+                },
+                {
+                    id = "log_performance",
+                    ui_name = "log performance data",
+                    ui_description = "logs performance data to your log",
+                    value_default = false,
+                    scope = MOD_SETTING_SCOPE_RUNTIME,
+                },
+                {
+                    id = "cache",
+                    ui_name = "cache entities",
+                    ui_description = "cache entity data to improve performance",
+                    value_default = false,
+                    scope = MOD_SETTING_SCOPE_RUNTIME,
+                },
+                {
+                    id = "enable_log",
+                    ui_name = "enable log",
+                    ui_description = "enabled noita log costing some performance",
+                    value_default = true,
+                    scope = MOD_SETTING_SCOPE_NEW_GAME,
                 },
                 {
                     id = "text_range",

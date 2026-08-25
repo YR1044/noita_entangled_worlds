@@ -64,7 +64,12 @@ local first = true
 
 local function hole(item)
     local ce = EntityGetFirstComponent(item, "CellEaterComponent")
-    if ce == nil or ComponentGetValue2(ce, "only_stain") or ComponentGetValue2(ce, "limited_materials") then
+    if
+        ce == nil
+        or ComponentGetValue2(ce, "only_stain")
+        or ComponentGetValue2(ce, "limited_materials")
+        or EntityGetFirstComponent(item, "PhysicsBodyComponent") ~= nil
+    then
         return
     end
     local r = 0
@@ -170,9 +175,11 @@ local exists
 
 local new_ents = {}
 
-function mod.on_new_entity(ent)
+function mod.on_new_entity(arr)
     if ctx.is_host then
-        table.insert(new_ents, ent)
+        for _, ent in ipairs(arr) do
+            table.insert(new_ents, ent)
+        end
     end
 end
 

@@ -12,7 +12,7 @@ np.EnableGameSimulatePausing(false)
 np.InstallDamageDetailsPatch()
 np.SilenceLogs("Warning - streaming didn't find any chunks it could stream away...\n")
 
-ewext = require("ewext1")
+ewext = require("ewext")
 
 -- Make some stuff global, as it's way too annoying to import each time.
 constants = dofile_once("mods/quant.ew/files/core/constants.lua")
@@ -35,8 +35,11 @@ dofile_once("data/scripts/lib/coroutines.lua")
 ModLuaFileAppend("data/scripts/gun/gun.lua", "mods/quant.ew/files/resource/append/gun.lua")
 ModLuaFileAppend("data/scripts/gun/gun_actions.lua", "mods/quant.ew/files/resource/append/action_fix.lua")
 
---ModMagicNumbersFileAdd("mods/quant.ew/files/magic.xml")
-ModMagicNumbersFileAdd("mods/quant.ew/files/magic_numbers.xml")
+if ModSettingGet("quant.ew.enable_log") or true then
+    ModMagicNumbersFileAdd("mods/quant.ew/files/magic_numbers.xml")
+else
+    ModMagicNumbersFileAdd("mods/quant.ew/files/magic.xml")
+end
 
 util.add_cross_call("ew_per_peer_seed", function()
     return tonumber(string.sub(ctx.my_id, 8, 12), 16), tonumber(string.sub(ctx.my_id, 12), 16)
@@ -76,6 +79,7 @@ local function load_modules()
         ctx.load_system("notplayer_ai")
         ctx.load_system("spectator_helps")
         ctx.load_system("end_fight")
+        ctx.load_system("heart_statue")
     end
 
     ctx.dofile_and_add_hooks("mods/quant.ew/files/system/nickname.lua")
@@ -135,7 +139,6 @@ local function load_modules()
     ctx.load_system("greed")
     ctx.load_system("spell_refresh")
     ctx.load_system("shiny_orb")
-    ctx.load_system("potion_mimic")
     ctx.load_system("map")
     ctx.load_system("homunculus")
     ctx.load_system("text")
@@ -282,7 +285,9 @@ function OnProjectileFired(
         local proj = EntityGetFirstComponentIncludingDisabled(projectile_id, "ProjectileComponent")
         local life = EntityGetFirstComponentIncludingDisabled(projectile_id, "LifetimeComponent")
         if proj == nil or ComponentGetValue2(proj, "lifetime") > 4 or ComponentGetValue2(life, "lifetime") > 4 then
-            ewext.sync_projectile(projectile_id, shooter_player_data.peer_id, rng)
+            if EntityGetIsAlive(projectile_id) then
+                ewext.sync_projectile(projectile_id, shooter_player_data.peer_id, rng)
+            end
         end
         if shooter_player_data.peer_id ~= ctx.my_id then
             if proj ~= nil then
@@ -536,20 +541,32 @@ local function on_world_pre_update_inner()
     if not ctx.run_ended then
         --local ti = GameGetRealWorldTimeSinceStarted()
         local n = EntitiesGetMaxID()
+        local arr = {}
         for ent = last_n + 1, n do
             if EntityGetIsAlive(ent) then
-                ctx.hook.on_new_entity(ent)
-                local homing = EntityGetFirstComponentIncludingDisabled(ent, "HomingComponent")
-                if homing ~= nil then
-                    local projcom = EntityGetFirstComponentIncludingDisabled(ent, "ProjectileComponent")
-                    if projcom ~= nil then
-                        local whoshot = ComponentGetValue2(projcom, "mWhoShot")
-                        if EntityHasTag(whoshot, "ew_notplayer") or GameHasFlagRun("ending_game_completed") then
-                            ComponentSetValue2(homing, "target_tag", "ew_peer")
+                if
+                    not ctx.is_host
+                    and ctx.proxy_opt.disable_kummitus
+                    and EntityGetName(ent) == "$animal_playerghost"
+                then
+                    EntityKill(ent)
+                else
+                    table.insert(arr, ent)
+                    local homing = EntityGetFirstComponentIncludingDisabled(ent, "HomingComponent")
+                    if homing ~= nil then
+                        local projcom = EntityGetFirstComponentIncludingDisabled(ent, "ProjectileComponent")
+                        if projcom ~= nil then
+                            local whoshot = ComponentGetValue2(projcom, "mWhoShot")
+                            if EntityHasTag(whoshot, "ew_notplayer") or GameHasFlagRun("ending_game_completed") then
+                                ComponentSetValue2(homing, "target_tag", "ew_peer")
+                            end
                         end
                     end
                 end
             end
+        end
+        if #arr ~= 0 then
+            ctx.hook.on_new_entity(arr)
         end
         last_n = n
         --local tf = GameGetRealWorldTimeSinceStarted()
@@ -634,6 +651,7 @@ function OnWorldPostUpdate() -- This is called every time the game has finished 
     util.tpcall(on_world_post_update_inner)
     ctx.events = {}
     net.proxy_send("flush", "")
+    ctx.finish()
 end
 
 function register_localizations(translation_file, clear_count)
